@@ -237,21 +237,20 @@ class MklDnnConv : public MklDnnKernel {
           {bias_dims_mkl}, MklDnnType<T>(), mkldnn::memory::format::any));
       
     auto algo = mkldnn::convolution_direct;
-    if (params.filter_dims.size() == 4 && parmas.filter_dims[2] == 3 &&
-        params.filter_dims[3] == 3 && params.strides.size() == 2 &&
-        params.stride[0] == 1 && params.stride[1] == 1) {
+    if (kernel_rank == 2 && kernel_shape[0] == 3 && kernel_shape[1] == 3 &&
+        strides_mkl.size() == 2 && strides_mkl[0] == 1 && strides_mkl[1] == 1) {
         algo = mkldnn::convolution_winograd;
     }
 
     if (!bias_dims_mkl.empty()) {
       fwd_desc_.reset(new mkldnn::convolution_forward::desc(
-          mkldnn::prop_kind::forward_inference, mkldnn::convolution_direct, *src_md_,
+          mkldnn::prop_kind::forward_inference, algo, *src_md_,
           *filter_md_, *bias_md_, *primitive_dst_md_,
           strides_mkl, dilations_mkl, padding_left_mkl,
           padding_right_mkl, mkldnn::padding_kind::zero));
     } else {
       fwd_desc_.reset(new mkldnn::convolution_forward::desc(
-          mkldnn::prop_kind::forward_inference, mkldnn::convolution_direct, *src_md_,
+          mkldnn::prop_kind::forward_inference, algo, *src_md_,
           *filter_md_, *primitive_dst_md_, strides_mkl,
           dilations_mkl, padding_left_mkl,
           padding_right_mkl, mkldnn::padding_kind::zero));
