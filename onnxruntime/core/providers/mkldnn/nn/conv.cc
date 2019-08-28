@@ -170,9 +170,9 @@ class ConvPrimitive : public PrimitiveBase {
           {params.bias_dims}, MklDnnType<T>(), mkldnn::memory::format::any));
 
     auto algo = mkldnn::convolution_direct;
-    if (params.filter_dims.size() == 4 && parmas.filter_dims[2] == 3 &&
+    if (params.filter_dims.size() == 4 && params.filter_dims[2] == 3 &&
         params.filter_dims[3] == 3 && params.strides.size() == 2 &&
-        params.stride[0] == 1 && params.stride[1] == 1) {
+        params.strides[0] == 1 && params.strides[1] == 1) {
         algo = mkldnn::convolution_winograd;
     }
     
