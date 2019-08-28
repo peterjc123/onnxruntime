@@ -235,6 +235,13 @@ class MklDnnConv : public MklDnnKernel {
     if (!bias_dims_mkl.empty())
       bias_md_.reset(new mkldnn::memory::desc(
           {bias_dims_mkl}, MklDnnType<T>(), mkldnn::memory::format::any));
+      
+    auto algo = mkldnn::convolution_direct;
+    if (params.filter_dims.size() == 4 && parmas.filter_dims[2] == 3 &&
+        params.filter_dims[3] == 3 && params.strides.size() == 2 &&
+        params.stride[0] == 1 && params.stride[1] == 1) {
+        algo = mkldnn::convolution_winograd;
+    }
 
     if (!bias_dims_mkl.empty()) {
       fwd_desc_.reset(new mkldnn::convolution_forward::desc(
